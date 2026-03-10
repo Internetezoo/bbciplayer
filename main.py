@@ -1,24 +1,20 @@
+from flask import Flask
 import requests
-import webbrowser
+import os
 
-def get_public_ip():
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    # IP lekérése
     try:
-        # Lekérjük a külső IP címet egy API segítségével
-        response = requests.get('https://api.ipify.org?format=json')
-        ip_data = response.json()
-        return ip_data['ip']
-    except Exception as e:
-        return f"Hiba az IP lekérésekor: {e}"
-
-def open_bbc_link():
-    url = "https://www.bbc.co.uk/iplayer/episode/b0873q2l/jonathan-creek-daemons-roost"
-    print(f"Betöltés: {url}")
+        ip = requests.get('https://api.ipify.org').text
+    except:
+        ip = "Nem sikerült lekérni"
     
-    # Megnyitja az alapértelmezett böngészőben (helyi futtatásnál működik)
-    webbrowser.open(url)
+    return f"<h1>Szia!</h1><p>A szerver IP címe: {ip}</p><p><a href='https://www.bbc.co.uk/iplayer/episode/b0873q2l/jonathan-creek-daemons-roost'>BBC Link</a></p>"
 
 if __name__ == "__main__":
-    current_ip = get_public_ip()
-    print(f"A jelenlegi IP címed: {current_ip}")
-    
-    open_bbc_link()
+    # A Northflank a PORT környezeti változót használja
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
